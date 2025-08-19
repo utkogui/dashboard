@@ -12,7 +12,6 @@ import {
   SettingOutlined,
 } from '@ant-design/icons'
 import { useAuth } from '../contexts/AuthContext'
-import ClientSelector from './ClientSelector'
 
 const { Sider } = Layout
 const { Title, Text } = Typography
@@ -98,11 +97,11 @@ const Sidebar = () => {
         borderRight: '1px solid #d9d9d9',
         display: 'flex',
         flexDirection: 'column',
-        height: '100%',
+        height: 'calc(100vh - 80px)',
         position: 'fixed',
         left: 0,
         top: 80,
-        bottom: 0,
+        overflowY: 'auto',
         zIndex: 999
       }}
     >
@@ -118,13 +117,6 @@ const Sidebar = () => {
           {usuario?.tipo === 'admin' ? 'Administração' : 'Alocações Matilha'}
         </Title>
       </div>
-
-      {/* ClientSelector apenas para administradores */}
-      {usuario?.tipo === 'admin' && (
-        <div style={{ padding: '0 16px 16px 16px' }}>
-          <ClientSelector />
-        </div>
-      )}
 
       <Menu
         mode="inline"

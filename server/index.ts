@@ -921,7 +921,14 @@ app.post('/api/auth/impersonate', verificarSessao, async (req: any, res) => {
     if (!userCliente) {
       return res.status(404).json({ error: 'Usuário do cliente não encontrado' })
     }
-    // Para JWT, retornar dados do usuário cliente sem criar sessão
+    // Gerar um JWT para o usuário cliente (sessão de impersonação)
+    const tokenCliente = generateToken({
+      id: userCliente.id,
+      email: userCliente.email,
+      tipo: 'cliente',
+      clienteId: userCliente.clienteId || undefined
+    })
+
     return res.json({
       usuario: {
         id: userCliente.id,
@@ -931,6 +938,7 @@ app.post('/api/auth/impersonate', verificarSessao, async (req: any, res) => {
         cliente: userCliente.cliente,
         impersonatedBy: usuarioAdmin.email
       },
+      sessionId: tokenCliente,
       message: 'Impersonação realizada com sucesso'
     })
   } catch (error) {
