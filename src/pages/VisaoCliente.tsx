@@ -40,6 +40,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { calcularDiasRestantes, getCardStyle } from '../utils/formatters'
 import logoFtdMatilha from '../assets/logo_ftd_matilha.png'
 import { track } from '../utils/telemetry'
+import { API_CONFIG } from '../config/api'
 
 const VisaoCliente = () => {
   const navigate = useNavigate()
@@ -188,11 +189,7 @@ const VisaoCliente = () => {
   const especialidades = [...new Set(profissionais.map(p => p.especialidade || '').filter(Boolean))] as string[]
   const senioridades = [...new Set(profissionais.map(p => p.perfil || '').filter(Boolean))] as string[]
 
-  const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || (
-    process.env.NODE_ENV === 'production'
-      ? 'https://dashcliente.onrender.com/api'
-      : 'http://localhost:3001/api'
-  )
+  const API_BASE_URL = API_CONFIG.BASE_URL
 
   // Inicializar filtros a partir da URL
   useEffect(() => {
