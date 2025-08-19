@@ -8,16 +8,18 @@ const PORT = 3001
 
 // Middleware
 const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(',')
+  ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
   : (process.env.NODE_ENV === 'production'
       ? ['https://dashcliente-1.onrender.com', 'https://dashcliente.onrender.com']
       : ['http://localhost:5173', 'http://10.0.1.214:5173', 'http://127.0.0.1:5173'])
 
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
+    // Permitir se sem origem (ex: curl) ou se wildcard configurado
     if (!origin) return callback(null, true)
+    if (allowedOrigins.includes('*')) return callback(null, true)
     if (allowedOrigins.includes(origin)) return callback(null, true)
-    return callback(new Error('Not allowed by CORS'))
+    return callback(new Error(`Not allowed by CORS: ${origin}`))
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
