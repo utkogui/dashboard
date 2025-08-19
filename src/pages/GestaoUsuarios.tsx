@@ -313,7 +313,7 @@ const GestaoUsuarios = () => {
                     size="small"
                   />
                   <Button variant="outlined" size="small" onClick={() => impersonate(cliente.id)}>
-                    Impersonar
+                    Ver painel
                   </Button>
                 </Box>
               </CardContent>
