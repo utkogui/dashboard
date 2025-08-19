@@ -1,0 +1,205 @@
+// This is your Prisma schema file for SQLite,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Profissional {
+  id                String     @id @default(cuid())
+  nome              String
+  email             String     @unique
+  especialidade     String
+  perfil            String?    // JUNIOR, PLENO, SENIOR, Especialista
+  especialidadeEspecifica String? // Service Designer, Research, UX Writer, etc.
+  valorHora         Float?     // Opcional agora (pode ser null para contratos fechados)
+  status            String     @default("ativo") // ativo, inativo, ferias
+  dataInicio        String     // Data de início (renomeado de dataAdmissao)
+  tipoContrato      String     @default("hora") // hora, fechado
+  valorFechado      Float?     // Valor do contrato fechado
+  periodoFechado    String?    // mensal, trimestral, semestral, anual
+  valorPago         Float      // Valor bruto pago ao profissional
+  tags              String?    // Tags separadas por vírgula (ex: "Alocação,Projetos,Bodyshop")
+  // Canais de contato do profissional
+  contatoClienteEmail    String?
+  contatoClienteTeams    String?
+  contatoClienteTelefone String?
+  contatoMatilhaEmail    String?
+  contatoMatilhaTeams    String?
+  contatoMatilhaTelefone String?
+  clienteId         String     // Cliente do sistema que possui este profissional
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  // Relacionamentos
+  contratos         ContratoProfissional[]
+  cliente           ClienteSistema @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@map("profissionais")
+}
+
+model Cliente {
+  id          String     @id @default(cuid())
+  nome        String
+  empresa     String
+  email       String     @unique
+  telefone    String?
+  endereco    String?
+  anoInicio   Int        // Ano de início do relacionamento com a Matilha
+  segmento    String     // Segmento de atuação
+  tamanho     String     @default("Média") // Pequena, Média, Grande
+  clienteId   String     // Cliente do sistema que possui este cliente
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relacionamentos
+  contratos   Contrato[]
+  cliente     ClienteSistema @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@map("clientes")
+}
+
+model Contrato {
+  id                 String   @id @default(cuid())
+  nomeProjeto        String   // Nome do projeto
+  codigoContrato     String?  // Código do contrato
+  clienteId          String   // Cliente de negócio (relacionado ao Cliente)
+  clienteSistemaId   String   // Cliente do sistema que possui este contrato
+  dataInicio         String
+  dataFim            String?
+  tipoContrato       String   @default("hora") // hora, fechado
+  valorContrato      Float    // Valor total do contrato
+  valorImpostos      Float    // Valor dos impostos
+  percentualImpostos Float    @default(13.0) // Percentual de impostos
+  status             String   @default("ativo") // ativo, encerrado, pendente
+  observacoes        String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  // Relacionamentos
+  cliente            Cliente      @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  clienteSistema     ClienteSistema @relation(fields: [clienteSistemaId], references: [id], onDelete: Cascade)
+  profissionais      ContratoProfissional[]
+  despesasAdicionais DespesaAdicional[]
+
+  @@map("contratos")
+}
+
+model DespesaAdicional {
+  id          String   @id @default(cuid())
+  contratoId  String
+  descricao   String   // Ex: "Software", "Risco", "Infraestrutura"
+  valor       Float    // Valor da despesa
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  contrato    Contrato @relation(fields: [contratoId], references: [id], onDelete: Cascade)
+
+  @@map("despesas_adicionais")
+}
+
+model ContratoProfissional {
+  id             String   @id @default(cuid())
+  contratoId     String
+  profissionalId String
+  valorHora      Float?   // Para contratos por hora
+  horasMensais   Int?     // Para contratos por hora
+  valorFechado   Float?   // Para contratos fechados
+  periodoFechado String?  // mensal, trimestral, semestral, anual
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relacionamentos
+  contrato       Contrato     @relation(fields: [contratoId], references: [id], onDelete: Cascade)
+  profissional   Profissional @relation(fields: [profissionalId], references: [id], onDelete: Cascade)
+
+  @@unique([contratoId, profissionalId])
+  @@map("contrato_profissionais")
+}
+
+// ===== NOVAS TABELAS PARA SISTEMA DE LOGIN =====
+
+model Usuario {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  senha       String   // Senha criptografada
+  tipo        String   @default("cliente") // admin, cliente
+  clienteId   String?  // Null para admin, ID do cliente para usuários cliente
+  ativo       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  cliente     ClienteSistema? @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@map("usuarios")
+}
+
+model ClienteSistema {
+  id          String   @id @default(cuid())
+  nome        String   // Nome do cliente do sistema (ex: "Matilha", "FTD")
+  descricao   String?  // Descrição opcional
+  ativo       Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  usuarios    Usuario[]
+  profissionais Profissional[]
+  clientes    Cliente[]
+  contratos   Contrato[]
+  interesses  ClienteInteresse[]
+  notas       ClienteNota[]
+  solicitacoes SolicitacaoProfissional[]
+
+  @@map("clientes_sistema")
+}
+
+// ===== TABELAS PARA INTERAÇÕES DO CLIENTE (Visão do Cliente) =====
+
+model ClienteInteresse {
+  id            String   @id @default(cuid())
+  clienteId     String
+  contratoId    String
+  profissionalId String
+  interesse     String   // RENOVAR | REDUZIR | TROCAR | ESPERAR
+  comentario    String?
+  createdAt     DateTime @default(now())
+
+  cliente       ClienteSistema @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@map("cliente_interesses")
+}
+
+model ClienteNota {
+  id            String   @id @default(cuid())
+  clienteId     String
+  contratoId    String
+  profissionalId String
+  texto         String
+  createdAt     DateTime @default(now())
+
+  cliente       ClienteSistema @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@map("cliente_notas")
+}
+
+model SolicitacaoProfissional {
+  id            String   @id @default(cuid())
+  clienteId     String
+  especialidade String
+  senioridade   String?
+  descricao     String?
+  status        String   @default("aberta")
+  createdAt     DateTime @default(now())
+
+  cliente       ClienteSistema @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+
+  @@map("solicitacoes_profissional")
+}

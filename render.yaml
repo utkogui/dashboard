@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: dash-ftd-frontend
+    runtime: static
+    buildCommand: npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://dashcliente.onrender.com/api
+
+  - type: web
+    name: dash-ftd-api
+    runtime: node
+    buildCommand: ./build-server.sh
+    startCommand: node server/index.mjs
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: file:./prisma/dev.db
+      - key: CORS_ORIGIN
+        value: https://dashcliente-1.onrender.com,https://dashcliente.onrender.com
