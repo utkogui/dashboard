@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { Row, Col, Card, Tag, Input, Select, Alert, Divider, Button, Modal, Typography, Skeleton, Pagination, Space, Spin, FloatButton } from 'antd'
-import { UserOutlined, SearchOutlined, FieldTimeOutlined, CalendarOutlined, FilterOutlined, MailOutlined, MessageOutlined, PhoneOutlined } from '@ant-design/icons'
-import { useNavigate, useSearchParams } from 'react-router-dom'
+import { useMemo, useState, useEffect, useRef } from 'react'
+import { Button, Card, Col, Divider, Input, Modal, Row, Space, Typography, FloatButton, Select, Skeleton, Alert, Pagination, Tag } from 'antd'
+import { SearchOutlined, FilterOutlined, CloseOutlined, FieldTimeOutlined, MessageOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { useData } from '../contexts/DataContext'
 import { useAuth } from '../contexts/AuthContext'
-import { calcularDiasRestantes, getRiskColors } from '../utils/formatters'
+import { calcularDiasRestantes, getCardStyle, getRiskColors } from '../utils/formatters'
 import logoFtdMatilha from '../assets/logo_ftd_matilha.png'
 import { track } from '../utils/telemetry'
+import { API_CONFIG } from '../config/api'
 import ProfessionalCard from '../components/cliente/ProfessionalCard'
 
 const { Text, Title } = Typography
@@ -46,10 +47,6 @@ const VisaoClienteAnt = () => {
   const [filterPrazo, setFilterPrazo] = useState<'todos' | '<15' | '<30' | '<60' | 'indeterminado'>('todos')
   const [filterSenioridade, setFilterSenioridade] = useState('todas')
   const [orderBy, setOrderBy] = useState<'prazo' | 'status'>('prazo')
-
-  const [interestLoading, setInterestLoading] = useState(false)
-  const [interestMessage, setInterestMessage] = useState<string | null>(null)
-  const [interestError, setInterestError] = useState<string | null>(null)
   const [selectedProfissionalId, setSelectedProfissionalId] = useState<string | null>(null)
   const [noteText, setNoteText] = useState('')
   const [noteError, setNoteError] = useState<string | null>(null)
@@ -539,75 +536,19 @@ const VisaoClienteAnt = () => {
                       )}
                     </Card>
 
-                    <Card size="small" style={{ borderRadius: 8 }}>
-                      <Text strong>Ações</Text>
+                    <Card size="small" style={{ borderRadius: 8, backgroundColor: '#f5f5f5', border: '1px dashed #ccc' }}>
+                      <Text strong style={{ color: '#666' }}>Ações</Text>
                       <Divider style={{ margin: '8px 0' }} />
-                      <Space wrap>
-                        <Button size="small" disabled={interestLoading} onClick={async () => {
-                          if (!projetoSel) return
-                          try {
-                            setInterestLoading(true); setInterestError(null); setInterestMessage(null)
-                            const resp = await fetch(`${API_BASE_URL}/client-actions/interest`, {
-                              method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionId}` },
-                              body: JSON.stringify({ interesse: 'RENOVAR', comentario: null, contratoId: projetoSel.contrato.id, profissionalId: profissionalSel.id })
-                            })
-                            const data = await resp.json()
-                            if (!resp.ok) throw new Error(data.error || 'Falha ao registrar interesse')
-                            setInterestMessage('Interesse registrada: Renovar')
-                            track({ type: 'interest_click', profissionalId: profissionalSel.id, contratoId: projetoSel.contrato.id, acao: 'RENOVAR' })
-                          } catch (e: any) { setInterestError(e.message) } finally { setInterestLoading(false) }
-                        }}>Renovar</Button>
-                        {(diasSel !== null && diasSel <= 60) && (
-                          <Button size="small" danger disabled={interestLoading} onClick={async () => {
-                            if (!projetoSel) return
-                            try {
-                              setInterestLoading(true); setInterestError(null); setInterestMessage(null)
-                              const resp = await fetch(`${API_BASE_URL}/client-actions/interest`, {
-                                method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionId}` },
-                                body: JSON.stringify({ interesse: 'ESPERAR', comentario: null, contratoId: projetoSel.contrato.id, profissionalId: profissionalSel.id })
-                              })
-                              const data = await resp.json()
-                              if (!resp.ok) throw new Error(data.error || 'Falha ao registrar interesse')
-                              setInterestMessage('Interesse registrada: Esperar')
-                              track({ type: 'interest_click', profissionalId: profissionalSel.id, contratoId: projetoSel.contrato.id, acao: 'ESPERAR' })
-                            } catch (e: any) { setInterestError(e.message) } finally { setInterestLoading(false) }
-                          }}>Esperar</Button>
-                        )}
-                        {interestLoading && <Text type="secondary">Enviando...</Text>}
-                        {interestMessage && <Text type="success">{interestMessage}</Text>}
-                        {interestError && <Text type="danger">{interestError}</Text>}
-                      </Space>
-                      <Text type="secondary" style={{ display: 'block', marginTop: 8 }}>
-                        “Esperar” aparece apenas para contratos com ≤ 60 dias.
-                      </Text>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 60 }}>
+                        <Text style={{ fontSize: 16, color: '#666', fontStyle: 'italic' }}>Em breve</Text>
+                      </div>
                     </Card>
 
-                    <Card size="small" style={{ borderRadius: 8 }}>
-                      <Text strong>Anotações do cliente</Text>
+                    <Card size="small" style={{ borderRadius: 8, backgroundColor: '#f5f5f5', border: '1px dashed #ccc' }}>
+                      <Text strong style={{ color: '#666' }}>Anotações do cliente</Text>
                       <Divider style={{ margin: '8px 0' }} />
-                      <Input.TextArea placeholder="Escreva uma anotação..." autoSize={{ minRows: 3 }} value={noteText} onChange={(e) => { setNoteText(e.target.value); setNoteError(null); setNoteSaved(false) }} />
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-                        <Button type="primary" size="small" onClick={async () => {
-                          if (!noteText.trim()) { setNoteError('Digite uma anotação antes de salvar'); return }
-                          if (!projetoSel) return
-                          try {
-                            const resp = await fetch(`${API_BASE_URL}/notes`, {
-                              method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionId}` },
-                              body: JSON.stringify({ contratoId: projetoSel.contrato.id, profissionalId: profissionalSel.id, texto: noteText.trim() })
-                            })
-                            const data = await resp.json()
-                            if (!resp.ok) throw new Error(data.error || 'Falha ao salvar anotação')
-                            setNoteSaved(true)
-                            setNoteError(null)
-                          } catch (e: any) {
-                            setNoteError(e.message)
-                            setNoteSaved(false)
-                          }
-                        }}>Salvar</Button>
-                      </div>
-                      <div style={{ marginTop: 6 }}>
-                        {noteError && <Text type="danger">{noteError}</Text>}
-                        {noteSaved && !noteError && <Text type="success">Anotação salva</Text>}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 60 }}>
+                        <Text style={{ fontSize: 16, color: '#666', fontStyle: 'italic' }}>Em breve</Text>
                       </div>
                     </Card>
                   </Space>

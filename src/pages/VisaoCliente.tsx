@@ -773,140 +773,28 @@ const VisaoCliente = () => {
 
                   {/* Ações de interesse do cliente (UI) */}
                   <Grid item xs={12} md={6}>
-                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-                      <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: '#f5f5f5', border: '1px dashed #ccc' }}>
+                      <Typography variant="subtitle2" fontWeight="bold" gutterBottom color="text.secondary">
                         Ações
                       </Typography>
-                      <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', alignItems: 'center' }}>
-                        <Button variant="outlined" size="small" disabled={interestLoading}
-                          onClick={async () => {
-                            if (!projetoSel) return
-                            try {
-                              setInterestLoading(true); setInterestError(null); setInterestMessage(null)
-                              const resp = await fetch(`${API_BASE_URL}/client-actions/interest`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionId}` },
-                                body: JSON.stringify({ interesse: 'RENOVAR', comentario: null, contratoId: projetoSel.contrato.id, profissionalId: profissionalSel.id })
-                              })
-                              const data = await resp.json()
-                              if (!resp.ok) throw new Error(data.error || 'Falha ao registrar interesse')
-                              setInterestMessage('Interesse registrada: Renovar')
-                              track({ type: 'interest_click', profissionalId: profissionalSel.id, contratoId: projetoSel.contrato.id, acao: 'RENOVAR' })
-                            } catch (e: any) {
-                              setInterestError(e.message)
-                            } finally { setInterestLoading(false) }
-                          }}
-                        >Renovar</Button>
-                        <Button variant="outlined" size="small" disabled={interestLoading}
-                          onClick={async () => {
-                            if (!projetoSel) return
-                            try {
-                              setInterestLoading(true); setInterestError(null); setInterestMessage(null)
-                              const resp = await fetch(`${API_BASE_URL}/client-actions/interest`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionId}` },
-                                body: JSON.stringify({ interesse: 'REDUZIR', comentario: null, contratoId: projetoSel.contrato.id, profissionalId: profissionalSel.id })
-                              })
-                              const data = await resp.json()
-                              if (!resp.ok) throw new Error(data.error || 'Falha ao registrar interesse')
-                              setInterestMessage('Interesse registrada: Reduzir')
-                              track({ type: 'interest_click', profissionalId: profissionalSel.id, contratoId: projetoSel.contrato.id, acao: 'REDUZIR' })
-                            } catch (e: any) {
-                              setInterestError(e.message)
-                            } finally { setInterestLoading(false) }
-                          }}
-                        >Reduzir</Button>
-                        <Button variant="outlined" size="small" disabled={interestLoading}
-                          onClick={async () => {
-                            if (!projetoSel) return
-                            try {
-                              setInterestLoading(true); setInterestError(null); setInterestMessage(null)
-                              const resp = await fetch(`${API_BASE_URL}/client-actions/interest`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionId}` },
-                                body: JSON.stringify({ interesse: 'TROCAR', comentario: null, contratoId: projetoSel.contrato.id, profissionalId: profissionalSel.id })
-                              })
-                              const data = await resp.json()
-                              if (!resp.ok) throw new Error(data.error || 'Falha ao registrar interesse')
-                              setInterestMessage('Interesse registrada: Trocar')
-                              track({ type: 'interest_click', profissionalId: profissionalSel.id, contratoId: projetoSel.contrato.id, acao: 'TROCAR' })
-                            } catch (e: any) {
-                              setInterestError(e.message)
-                            } finally { setInterestLoading(false) }
-                          }}
-                        >Trocar</Button>
-                        {(diasSel !== null && diasSel <= 60) && (
-                          <Button variant="outlined" size="small" color="warning" disabled={interestLoading}
-                            onClick={async () => {
-                              if (!projetoSel) return
-                              try {
-                                setInterestLoading(true); setInterestError(null); setInterestMessage(null)
-                                const resp = await fetch(`${API_BASE_URL}/client-actions/interest`, {
-                                  method: 'POST',
-                                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionId}` },
-                                  body: JSON.stringify({ interesse: 'ESPERAR', comentario: null, contratoId: projetoSel.contrato.id, profissionalId: profissionalSel.id })
-                                })
-                                const data = await resp.json()
-                                if (!resp.ok) throw new Error(data.error || 'Falha ao registrar interesse')
-                                setInterestMessage('Interesse registrada: Esperar')
-                                track({ type: 'interest_click', profissionalId: profissionalSel.id, contratoId: projetoSel.contrato.id, acao: 'ESPERAR' })
-                              } catch (e: any) {
-                                setInterestError(e.message)
-                              } finally { setInterestLoading(false) }
-                            }}
-                          >Esperar</Button>
-                        )}
-                        {interestLoading && <Typography variant="caption" color="text.secondary">Enviando...</Typography>}
-                        {interestMessage && <Typography variant="caption" color="success.main">{interestMessage}</Typography>}
-                        {interestError && <Typography variant="caption" color="error.main">{interestError}</Typography>}
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 80 }}>
+                        <Typography variant="h6" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                          Em breve
+                        </Typography>
                       </Box>
-                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                        “Esperar” aparece apenas para contratos com ≤ 60 dias.
-                      </Typography>
                     </Paper>
                   </Grid>
 
                   {/* Anotações do cliente (UI) */}
                   <Grid item xs={12} md={6}>
-                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-                      <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: '#f5f5f5', border: '1px dashed #ccc' }}>
+                      <Typography variant="subtitle2" fontWeight="bold" gutterBottom color="text.secondary">
                         Anotações do cliente
                       </Typography>
-                      <TextField
-                        fullWidth
-                        placeholder="Escreva uma anotação..."
-                        multiline
-                        minRows={3}
-                        value={noteText}
-                        onChange={(e) => { setNoteText(e.target.value); setNoteError(null); setNoteSaved(false) }}
-                        error={Boolean(noteError)}
-                        helperText={noteError || (noteSaved ? 'Anotação salva' : ' ')}
-                      />
-                      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-                        <Button 
-                          variant="contained" 
-                          size="small"
-                          onClick={async () => {
-                            if (!noteText.trim()) { setNoteError('Digite uma anotação antes de salvar'); return }
-                            if (!projetoSel) return
-                            try {
-                              const resp = await fetch(`${API_BASE_URL}/notes`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionId}` },
-                                body: JSON.stringify({ contratoId: projetoSel.contrato.id, profissionalId: profissionalSel.id, texto: noteText.trim() })
-                              })
-                              const data = await resp.json()
-                              if (!resp.ok) throw new Error(data.error || 'Falha ao salvar anotação')
-                              setNoteSaved(true)
-                              setNoteError(null)
-                            } catch (e: any) {
-                              setNoteError(e.message)
-                              setNoteSaved(false)
-                            }
-                          }}
-                        >
-                          Salvar
-                        </Button>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 80 }}>
+                        <Typography variant="h6" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                          Em breve
+                        </Typography>
                       </Box>
                     </Paper>
                   </Grid>
