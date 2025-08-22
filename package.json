@@ -21,7 +21,16 @@
     "db:setup": "node scripts/setup-postgres.js",
     "db:import": "node scripts/import-to-postgres.js",
     "db:test": "node scripts/test-postgres-connection.js",
-    "db:migrate": "npm run db:export && npm run db:setup && npm run db:import && npm run db:test"
+    "db:migrate": "npm run db:export && npm run db:setup && npm run db:import && npm run db:test",
+    "backup:sql": "node scripts/backup-neon.cjs",
+    "backup:json": "node scripts/backup-prisma.js",
+    "backup:restore": "node scripts/restore-backup.js",
+    "import:csv": "node scripts/import-profi-csv.js",
+    "update:contatos": "node scripts/update-contatos-profissionais.js",
+    "import:producao": "node scripts/import-profi-producao.js",
+    "import:excel": "node scripts/import-excel-profi.js",
+    "limpar:profissionais": "node scripts/limpar-profissionais.js",
+    "reset:profissionais": "npm run limpar:profissionais && npm run import:producao"
   },
   "dependencies": {
     "@ant-design/icons": "^6.0.0",

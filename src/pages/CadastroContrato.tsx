@@ -199,6 +199,7 @@ const CadastroContrato = () => {
         // Preencher formulário com dados do contrato
         form.setFieldsValue({
           nomeProjeto: contrato.nomeProjeto,
+          nomeProjetoPai: contrato.nomeProjetoPai || '',
           codigoContrato: contrato.codigoContrato || '',
           clienteId: contrato.clienteId,
           dataInicio: contrato.dataInicio ? dayjs(contrato.dataInicio) : null,
@@ -304,6 +305,7 @@ const CadastroContrato = () => {
 
   const handleSubmit = async (values: {
     nomeProjeto: string
+    nomeProjetoPai?: string
     codigoContrato?: string
     clienteId: string
     dataInicio: dayjs.Dayjs
@@ -423,6 +425,7 @@ const CadastroContrato = () => {
 
       const contratoData: NovoContrato = {
         nomeProjeto: values.nomeProjeto,
+        nomeProjetoPai: values.nomeProjetoPai || null,
         codigoContrato: values.codigoContrato || null,
         clienteId: values.clienteId,
         dataInicio: values.dataInicio?.format('YYYY-MM-DD') || '',
@@ -505,13 +508,14 @@ const CadastroContrato = () => {
               Dados do Projeto
             </Title>
 
-            <Row gutter={[16, 16]}>
-              {/* Cliente primeiro */}
+            <Row gutter={[24, 16]}>
+              {/* Coluna Esquerda */}
               <Col xs={24} md={12}>
                 <Form.Item
                   name="clienteId"
                   label="Cliente"
                   rules={[{ required: true, message: 'Cliente é obrigatório' }]}
+                  style={{ marginBottom: 16 }}
                 >
                   <Select placeholder="Selecione o cliente">
                     {clientes.map((cliente) => (
@@ -521,34 +525,40 @@ const CadastroContrato = () => {
                     ))}
                   </Select>
                 </Form.Item>
-              </Col>
 
-              {/* Nome do Projeto */}
-              <Col xs={24} md={12}>
                 <Form.Item
                   name="nomeProjeto"
                   label="Nome do Projeto"
                   rules={[{ required: true, message: 'Nome do projeto é obrigatório' }]}
+                  style={{ marginBottom: 16 }}
                 >
                   <Input placeholder="Digite o nome do projeto" />
                 </Form.Item>
-              </Col>
 
-              {/* Código e Data de Início */}
-              <Col xs={24} md={12}>
+                <Form.Item
+                  name="nomeProjetoPai"
+                  label="Nome Projeto Pai"
+                  style={{ marginBottom: 16 }}
+                >
+                  <Input placeholder="Digite o nome do projeto pai (opcional)" />
+                </Form.Item>
+
                 <Form.Item
                   name="codigoContrato"
                   label="Código do Contrato"
+                  style={{ marginBottom: 16 }}
                 >
                   <Input placeholder="Digite o código do contrato (opcional)" />
                 </Form.Item>
               </Col>
 
+              {/* Coluna Direita */}
               <Col xs={24} md={12}>
                 <Form.Item
                   name="dataInicio"
                   label="Data de Início"
                   rules={[{ required: true, message: 'Data de início é obrigatória' }]}
+                  style={{ marginBottom: 16 }}
                 >
                   <DatePicker 
                     style={{ width: '100%' }} 
@@ -556,29 +566,25 @@ const CadastroContrato = () => {
                     format="DD/MM/YYYY"
                   />
                 </Form.Item>
-              </Col>
 
-              {/* Contrato indeterminado antes da Data de Fim */}
-              <Col xs={24}>
                 <Form.Item
                   name="contratoIndeterminado"
                   valuePropName="checked"
+                  style={{ marginBottom: 16 }}
                 >
                   <Checkbox>Contrato Indeterminado</Checkbox>
                 </Form.Item>
-              </Col>
 
-              {/* Data de Fim (quando não indeterminado) */}
-              <Form.Item noStyle shouldUpdate>
-                {({ getFieldValue }) => {
-                  const contratoIndeterminado = getFieldValue('contratoIndeterminado')
-                  
-                  if (contratoIndeterminado) {
-                    return null // Não mostra o campo quando indeterminado
-                  }
-                  
-                  return (
-                    <Col xs={24} md={12}>
+                {/* Data de Fim (quando não indeterminado) */}
+                <Form.Item noStyle shouldUpdate>
+                  {({ getFieldValue }) => {
+                    const contratoIndeterminado = getFieldValue('contratoIndeterminado')
+                    
+                    if (contratoIndeterminado) {
+                      return null // Não mostra o campo quando indeterminado
+                    }
+                    
+                    return (
                       <Form.Item
                         name="dataFim"
                         label="Data de Fim"
@@ -592,6 +598,7 @@ const CadastroContrato = () => {
                             },
                           }),
                         ]}
+                        style={{ marginBottom: 16 }}
                       >
                         <DatePicker 
                           style={{ width: '100%' }} 
@@ -599,10 +606,10 @@ const CadastroContrato = () => {
                           format="DD/MM/YYYY"
                         />
                       </Form.Item>
-                    </Col>
-                  )
-                }}
-              </Form.Item>
+                    )
+                  }}
+                </Form.Item>
+              </Col>
             </Row>
 
             <Divider />

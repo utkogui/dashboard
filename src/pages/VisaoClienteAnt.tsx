@@ -450,10 +450,17 @@ const VisaoClienteAnt = () => {
                               const contatoEmail = profissionalSel.contatoClienteEmail
                               const contatoTelefone = profissionalSel.contatoClienteTelefone
                               const teamsHref = contatoEmail ? `https://teams.microsoft.com/l/chat/0/0?users=${encodeURIComponent(contatoEmail)}` : undefined
+                              
+                              // Debug: mostrar sempre pelo menos o email se existir
+                              if (!contatoEmail && !contatoTelefone) {
+                                return <Text type="secondary" style={{ fontSize: 12 }}>Não informado</Text>
+                              }
+                              
                               return (
                                 <>
                                   {contatoEmail && <Button size="small" icon={<MessageOutlined />} href={teamsHref} target="_blank">Teams</Button>}
                                   {contatoEmail && <Button size="small" icon={<MailOutlined />} href={`mailto:${contatoEmail}`}>Email</Button>}
+                                  {contatoEmail && <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>{contatoEmail}</Text>}
                                   {contatoTelefone && <Tag icon={<PhoneOutlined />}>{contatoTelefone}</Tag>}
                                 </>
                               )
@@ -467,10 +474,17 @@ const VisaoClienteAnt = () => {
                               const contatoEmail = profissionalSel.contatoMatilhaEmail
                               const contatoTelefone = profissionalSel.contatoMatilhaTelefone
                               const teamsHref = contatoEmail ? `https://teams.microsoft.com/l/chat/0/0?users=${encodeURIComponent(contatoEmail)}` : undefined
+                              
+                              // Debug: mostrar sempre pelo menos o email se existir
+                              if (!contatoEmail && !contatoTelefone) {
+                                return <Text type="secondary" style={{ fontSize: 12 }}>Não informado</Text>
+                              }
+                              
                               return (
                                 <>
                                   {contatoEmail && <Button size="small" icon={<MessageOutlined />} href={teamsHref} target="_blank">Teams</Button>}
                                   {contatoEmail && <Button size="small" icon={<MailOutlined />} href={`mailto:${contatoEmail}`}>Email</Button>}
+                                  {contatoEmail && <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>{contatoEmail}</Text>}
                                   {contatoTelefone && <Tag icon={<PhoneOutlined />}>{contatoTelefone}</Tag>}
                                 </>
                               )
