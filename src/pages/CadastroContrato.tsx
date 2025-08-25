@@ -425,7 +425,7 @@ const CadastroContrato = () => {
 
       const contratoData: NovoContrato = {
         nomeProjeto: values.nomeProjeto,
-        nomeProjetoPai: values.nomeProjetoPai || null,
+        // nomeProjetoPai: values.nomeProjetoPai || null, // Temporariamente comentado
         codigoContrato: values.codigoContrato || null,
         clienteId: values.clienteId,
         dataInicio: values.dataInicio?.format('YYYY-MM-DD') || '',
@@ -535,6 +535,7 @@ const CadastroContrato = () => {
                   <Input placeholder="Digite o nome do projeto" />
                 </Form.Item>
 
+                {/* Temporariamente comentado
                 <Form.Item
                   name="nomeProjetoPai"
                   label="Nome Projeto Pai"
@@ -542,6 +543,7 @@ const CadastroContrato = () => {
                 >
                   <Input placeholder="Digite o nome do projeto pai (opcional)" />
                 </Form.Item>
+                */}
 
                 <Form.Item
                   name="codigoContrato"
