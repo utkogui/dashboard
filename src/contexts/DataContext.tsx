@@ -51,6 +51,7 @@ interface DespesaAdicional {
 interface Contrato {
   id: string
   nomeProjeto: string
+  nomeProjetoPai?: string
   codigoContrato?: string
   clienteId: string
   dataInicio: string
