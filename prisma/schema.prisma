@@ -69,7 +69,6 @@ model Contrato {
   id                 String   @id @default(cuid())
   nomeProjeto        String   // Nome do projeto
   nomeInterno        String?  // Nome interno do projeto
-  nomeProjetoPai     String?  // Nome do projeto pai
   codigoContrato     String?  // Código do contrato
   clienteId          String   // Cliente de negócio (relacionado ao Cliente)
   clienteSistemaId   String   // Cliente do sistema que possui este contrato

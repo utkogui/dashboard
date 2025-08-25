@@ -423,7 +423,7 @@ const CadastroContrato = () => {
 
       const contratoData: NovoContrato = {
         nomeProjeto: values.nomeProjeto,
-        // nomeProjetoPai: values.nomeProjetoPai || null, // Temporariamente comentado
+
         codigoContrato: values.codigoContrato || null,
         clienteId: values.clienteId,
         dataInicio: values.dataInicio?.format('YYYY-MM-DD') || '',
