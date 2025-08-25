@@ -10,7 +10,7 @@ const PORT = 3001
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(',').map(s => s.trim())
   : (process.env.NODE_ENV === 'production'
-      ? ['https://dashcliente-1.onrender.com', 'https://dashcliente.onrender.com']
+      ? ['https://dashboard-1fyp.onrender.com', 'https://dashcliente-1.onrender.com', 'https://dashcliente.onrender.com', '*'] // Adicionado dashboard-1fyp e wildcard
       : ['http://localhost:5173', 'http://10.0.1.214:5173', 'http://127.0.0.1:5173'])
 
 const corsOptions: cors.CorsOptions = {

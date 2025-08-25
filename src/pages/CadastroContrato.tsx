@@ -199,7 +199,6 @@ const CadastroContrato = () => {
         // Preencher formulário com dados do contrato
         form.setFieldsValue({
           nomeProjeto: contrato.nomeProjeto,
-          nomeProjetoPai: contrato.nomeProjetoPai || '',
           codigoContrato: contrato.codigoContrato || '',
           clienteId: contrato.clienteId,
           dataInicio: contrato.dataInicio ? dayjs(contrato.dataInicio) : null,
@@ -305,7 +304,6 @@ const CadastroContrato = () => {
 
   const handleSubmit = async (values: {
     nomeProjeto: string
-    nomeProjetoPai?: string
     codigoContrato?: string
     clienteId: string
     dataInicio: dayjs.Dayjs
@@ -425,7 +423,7 @@ const CadastroContrato = () => {
 
       const contratoData: NovoContrato = {
         nomeProjeto: values.nomeProjeto,
-        // nomeProjetoPai: values.nomeProjetoPai || null, // Temporariamente comentado
+
         codigoContrato: values.codigoContrato || null,
         clienteId: values.clienteId,
         dataInicio: values.dataInicio?.format('YYYY-MM-DD') || '',
@@ -534,16 +532,6 @@ const CadastroContrato = () => {
                 >
                   <Input placeholder="Digite o nome do projeto" />
                 </Form.Item>
-
-                {/* Temporariamente comentado
-                <Form.Item
-                  name="nomeProjetoPai"
-                  label="Nome Projeto Pai"
-                  style={{ marginBottom: 16 }}
-                >
-                  <Input placeholder="Digite o nome do projeto pai (opcional)" />
-                </Form.Item>
-                */}
 
                 <Form.Item
                   name="codigoContrato"
