@@ -27,7 +27,12 @@ import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
 const { Option } = Select
-  
+
+// Função utilitária para calcular número de meses entre duas datas
+const calcularMesesDuracao = (dataInicio: Date, dataFim: Date): number => {
+  return Math.max(1, (dataFim.getFullYear() - dataInicio.getFullYear()) * 12 + 
+    (dataFim.getMonth() - dataInicio.getMonth()) + 1) // +1 para incluir o mês inicial
+}
 
 const CadastroContrato = () => {
   const navigate = useNavigate()
@@ -80,10 +85,20 @@ const CadastroContrato = () => {
         // Para contratos fechados, considerar o tipo de valor
         const tipoValor = formValues.tipoValorFechado || 'total'
         if (tipoValor === 'mensal') {
-          valorContrato = parseFloat(formValues.valorContrato) || 0
+          const valorMensal = parseFloat(formValues.valorContrato) || 0
+          
           if (formValues.contratoIndeterminado) {
             // Se for mensal + indeterminado, considerar 12 meses
-            valorContrato = valorContrato * 12
+            valorContrato = valorMensal * 12
+          } else if (formValues.dataInicio && formValues.dataFim) {
+            // Calcular número de meses entre as datas
+            const dataInicio = formValues.dataInicio.toDate()
+            const dataFim = formValues.dataFim.toDate()
+            const mesesDuracao = calcularMesesDuracao(dataInicio, dataFim)
+            valorContrato = valorMensal * mesesDuracao
+          } else {
+            // Se não tem datas definidas, usar valor mensal como total
+            valorContrato = valorMensal
           }
         } else {
           // Se for total, usar diretamente
@@ -110,9 +125,22 @@ const CadastroContrato = () => {
         if (tipoValor === 'mensal') {
           valorMensalBase = parseFloat(formValues.valorContrato) || 0
         } else {
-          // Para contratos fechados com valor total, usar base mensal padrão
-          // (não dividir por duração do projeto)
-          valorMensalBase = (parseFloat(formValues.valorContrato) || 0) / 12
+          // Para contratos fechados com valor total, calcular base mensal baseada no período
+          const valorTotal = parseFloat(formValues.valorContrato) || 0
+          
+          if (formValues.contratoIndeterminado) {
+            // Se for indeterminado, dividir por 12 meses
+            valorMensalBase = valorTotal / 12
+          } else if (formValues.dataInicio && formValues.dataFim) {
+            // Calcular número de meses entre as datas
+            const dataInicio = formValues.dataInicio.toDate()
+            const dataFim = formValues.dataFim.toDate()
+            const mesesDuracao = calcularMesesDuracao(dataInicio, dataFim)
+            valorMensalBase = valorTotal / mesesDuracao
+          } else {
+            // Se não tem datas definidas, usar base mensal padrão de 12 meses
+            valorMensalBase = valorTotal / 12
+          }
         }
       }
 
@@ -403,18 +431,29 @@ const CadastroContrato = () => {
       } else {
         // Para contratos fechados
         if (values.tipoValorFechado === 'mensal') {
-          // Se é mensal, converter para total
-          valorContratoFinal = parseFloat(values.valorContrato) || 0
+          // Se é mensal, converter para total baseado no período
+          const valorMensal = parseFloat(values.valorContrato) || 0
+          
           if (values.contratoIndeterminado) {
-            valorContratoFinal = valorContratoFinal * 12
+            // Se for indeterminado, considerar 12 meses
+            valorContratoFinal = valorMensal * 12
+          } else if (values.dataInicio && values.dataFim) {
+            // Calcular número de meses entre as datas
+            const dataInicio = values.dataInicio.toDate()
+            const dataFim = values.dataFim.toDate()
+            const mesesDuracao = calcularMesesDuracao(dataInicio, dataFim)
+            valorContratoFinal = valorMensal * mesesDuracao
+          } else {
+            // Se não tem datas definidas, usar valor mensal como total
+            valorContratoFinal = valorMensal
           }
         } else {
           // Se é total, usar diretamente
           valorContratoFinal = parseFloat(values.valorContrato) || 0
         }
         
-        // Para impostos, sempre usar o valor TOTAL (não mensal)
-        valorContratoParaImpostos = parseFloat(values.valorContrato) || 0
+        // Para impostos, sempre usar o valor TOTAL calculado
+        valorContratoParaImpostos = valorContratoFinal
       }
 
       const percentualImpostosNumber = parseFloat(values.percentualImpostos) || 13.0
