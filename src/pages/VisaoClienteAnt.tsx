@@ -388,7 +388,15 @@ const VisaoClienteAnt = () => {
               if (!prof) return { borderRadius: 16, backgroundColor: '#ffffff' }
               const info = getProfissionalInfo(prof)
               const projetoSel = info.projetos[0]
-              if (!projetoSel) return { borderRadius: 16, backgroundColor: '#ffffff' }
+              if (!projetoSel) {
+                // Para profissionais não alocados, usar azul
+                return {
+                  borderRadius: 16,
+                  backgroundColor: '#ffffff',
+                  border: '1px solid #3b82f6',
+                  ['--riskBarBg' as any]: '#3b82f6',
+                } as any
+              }
               const dias = calcularDiasRestantes(projetoSel.contrato)
               const risk = getRiskColors(dias)
               return {

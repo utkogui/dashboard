@@ -22,9 +22,9 @@ interface ProfessionalCardProps {
 }
 
 const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ profissional, projeto, diasRestantes, contatoCliente, onOpen }) => {
-  const risk = getRiskColors(diasRestantes)
   const emProjeto = Boolean(projeto)
-  const disponibilidadeCor = emProjeto ? '#22c55e' : '#ff9aa2'
+  const risk = emProjeto ? getRiskColors(diasRestantes) : { barBg: '#3b82f6', cardBg: 'rgba(59, 130, 246, 0.08)', text: '#3b82f6' }
+  const disponibilidadeCor = emProjeto ? '#22c55e' : '#3b82f6'
   const [isFocused, setIsFocused] = useState(false)
 
   return (
@@ -48,7 +48,7 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ profissional, proje
           <div style={{ width: 10, height: 10, borderRadius: '50%', background: disponibilidadeCor }} />
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <Text strong style={{ color: emProjeto ? '#1677ff' : '#faad14' }}>{emProjeto ? 'Em projeto' : 'Disponível'}</Text>
+          <Text strong style={{ color: emProjeto ? '#1677ff' : '#3b82f6' }}>{emProjeto ? 'Em projeto' : 'Disponível'}</Text>
         </div>
         <Text type="secondary" style={{ marginTop: 3 }}>{profissional.especialidade}</Text>
         

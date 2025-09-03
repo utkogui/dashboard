@@ -241,7 +241,18 @@ const VisaoCliente = () => {
   }
 
   // Estilo do modal: linha superior fixa e fundo igual ao card da frente
-  const modalTopBarColor = '#22c55e'
+  const modalTopBarColor = useMemo(() => {
+    if (!selectedProfissionalId) return '#22c55e'
+    const prof = profissionais.find(p => p.id === selectedProfissionalId)
+    if (!prof) return '#22c55e'
+    const info = getProfissionalInfo(prof)
+    const proj = info.projetos[0]
+    if (proj && proj.contrato) {
+      const dias = getDiasRestantes(proj)
+      return getDiasRestantesColor(dias)
+    }
+    return '#3b82f6' // Azul para não alocados
+  }, [selectedProfissionalId, profissionais])
   // removido selectedBgColor não utilizado
 
   const selectedCardStyle = useMemo(() => {
@@ -259,7 +270,12 @@ const VisaoCliente = () => {
       const style = getCardStyle(proj.contrato) as any
       return { ...fallback, ...style }
     }
-    return fallback
+    // Para profissionais não alocados, usar estilo azul
+    return {
+      boxShadow: '0 4px 16px rgba(59, 130, 246, 0.25)',
+      border: '2px solid rgba(59, 130, 246, 0.3)',
+      backgroundColor: 'rgba(59, 130, 246, 0.08)'
+    }
   }, [selectedProfissionalId, profissionais, contratos, clientes])
 
   return (
@@ -472,7 +488,7 @@ const VisaoCliente = () => {
               const diasRestantes = projetoAtivo ? getDiasRestantes(projetoAtivo) : null
               const diasColor = getDiasRestantesColor(diasRestantes)
               const emProjeto = info.status === 'ativo' && Boolean(projetoAtivo)
-              const disponibilidadeCor = emProjeto ? '#22c55e' : '#ff9aa2'
+              const disponibilidadeCor = emProjeto ? '#22c55e' : '#3b82f6' // Azul para não alocados
               
               return (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={profissional.id}>
@@ -494,24 +510,28 @@ const VisaoCliente = () => {
                         transform: 'translateY(-8px)',
                         boxShadow: '0 8px 32px rgba(0,0,0,0.12)'
                       },
-                      ...(info.status === 'ativo' && projetoAtivo ? getCardStyle(projetoAtivo.contrato) : {})
+                      ...(info.status === 'ativo' && projetoAtivo ? getCardStyle(projetoAtivo.contrato) : {
+                        boxShadow: '0 4px 16px rgba(59, 130, 246, 0.25)',
+                        border: '2px solid rgba(59, 130, 246, 0.3)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.08)'
+                      })
                     }}
                   >
                     {/* faixa de status no topo */}
-                    <Box sx={{ height: 6, width: '100%', bgcolor: diasColor, borderTopLeftRadius: 12, borderTopRightRadius: 12 }} />
+                    <Box sx={{ height: 6, width: '100%', bgcolor: emProjeto ? diasColor : '#3b82f6', borderTopLeftRadius: 12, borderTopRightRadius: 12 }} />
                     <CardContent sx={{ flexGrow: 1, p: 3, display: 'flex', flexDirection: 'column' }}>
                         <>
                           {/* TOPO - 35% */}
                           <Box sx={{ flex: '0 0 35%', display: 'flex', flexDirection: 'column' }}>
                             {/* Nome e Disponibilidade */}
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                              <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: disponibilidadeCor, boxShadow: `0 0 0 3px ${emProjeto ? 'rgba(34, 197, 94, 0.15)' : 'rgba(239, 68, 68, 0.12)'}` }} />
+                              <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: disponibilidadeCor, boxShadow: `0 0 0 3px ${emProjeto ? 'rgba(34, 197, 94, 0.15)' : 'rgba(59, 130, 246, 0.15)'}` }} />
                               <Typography variant="h6" component="h3" fontWeight="bold" noWrap title={profissional.nome}>
                                 {profissional.nome}
                               </Typography>
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <Typography variant="caption" color={emProjeto ? 'success.main' : 'warning.main'} sx={{ fontWeight: 700 }}>
+                              <Typography variant="caption" color={emProjeto ? 'success.main' : 'primary.main'} sx={{ fontWeight: 700 }}>
                                 {emProjeto ? 'Em projeto' : 'Disponível'}
                               </Typography>
                               {info.projetos.length > 1 && (
